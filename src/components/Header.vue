@@ -7,7 +7,7 @@
     <ul class="flex items-center gap-10">
       <li class="flex items-center gap-3 cursor-pointer hover:text-emerald-400">
         <img src="/cart.svg" alt="Cart" class="w-8" />
-        <b><span>&#8364;</span>1205 </b>
+        <b>&#8364;1205</b>
       </li>
 
       <li class="flex items-center gap-3 cursor-pointer hover:text-emerald-400">
