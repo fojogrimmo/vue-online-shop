@@ -31,17 +31,17 @@ defineProps({
 
     <div class="p-2">
       <p class="font-medium mt-1">{{ title }}</p>
-      <div class="flex justify-between">
-        <div class="flex flex-col">
+      <div class="flex justify-between mb-4">
+        <div class="flex flex-col justify-between">
           <p>{{ subtitle }}</p>
-          <span class="font-medium mt-4">&#8364;{{ price }}</span>
+          <span class="font-medium absolute bottom-2">&#8364;{{ price }}</span>
         </div>
         <button>
           <img
             @click="onClickAdd"
             :src="!isAdded ? '/plus.svg' : 'checked.svg'"
             alt="Plus"
-            class="scale-125 mr-4"
+            class="scale-125 mr-4 mt-5"
           />
         </button>
       </div>
