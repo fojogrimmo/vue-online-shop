@@ -11,6 +11,11 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest'
   },
+  env: {
+    es6: true,
+    node: true,
+    browser: true
+  },
   rules: {
     'vue/multi-word-component-names': 'off'
   }
