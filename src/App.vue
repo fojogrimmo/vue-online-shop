@@ -124,6 +124,23 @@ const items = [
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-white shadow-xl mt-14">
     <Header />
 
+    <div class="relative items-center">
+      <img class="m-auto min-w-full px-16" src="/cover.jpg" alt="Cover image" />
+      <div class="absolute top-20 left-20 p-20 w-3/5 pr-96">
+        <h2
+          class="mb-5 text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-zinc-300 via-slate-100 to-zinc-500"
+        >
+          More than just a game. <br />
+          It's a lifestyle.
+        </h2>
+        <p class="mb-8 text-2xl text-white pr-2 font-thin">
+          Whether you're just starting out, have played your whole life, or you're a Tour pro, your
+          swing is like a fingerprint.
+        </p>
+        <button>Shopping Now</button>
+      </div>
+    </div>
+
     <div class="p-10 m-4">
       <div class="flex justify-between items-center">
         <h2 class="text-3xl font-bold mb-10">Best Sellers</h2>
