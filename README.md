@@ -1,6 +1,5 @@
 # vue-shop
 
-This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
 
@@ -20,6 +19,11 @@ npm install
 
 ```sh
 npm run dev
+```
+### Run Backend Server
+
+```sh
+node server.js
 ```
 
 ### Compile and Minify for Production
