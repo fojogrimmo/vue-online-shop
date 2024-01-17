@@ -18,6 +18,7 @@ const onClickAdd = () => {
       :subtitle="item.subtitle"
       :imageUrl="item.imageUrl"
       :price="item.price"
+      :isHot="item.id < 9"
       :onClickAdd="onClickAdd"
     />
   </div>

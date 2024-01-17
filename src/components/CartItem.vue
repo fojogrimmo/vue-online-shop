@@ -3,7 +3,7 @@
     <img class="w-32 h-auto" src="/items/sneakers-1.png" alt="Sneakers" />
 
     <div class="flex flex-col">
-      <p>Nike - Men's Tiger Woods '13 Golf Shoes</p>
+      <p>Product Name</p>
 
       <div class="flex justify-between mt-2">
         <b>&#8364;1233</b>
