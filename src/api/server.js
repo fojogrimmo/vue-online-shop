@@ -17,8 +17,24 @@ app.use((req, res, next) => {
 app.get('/api/products', async (req, res) => {
   try {
     const data = await readFile(new URL('./products.json', import.meta.url), 'utf-8')
-    const products = JSON.parse(data)
-    res.send(JSON.stringify(products))
+    let products = JSON.parse(data)
+
+    const sortOption = req.query.sort
+    const searchQuery = req.query.title ? req.query.title.toLowerCase() : ''
+
+    if (sortOption === 'priceHighToLow') {
+      products.sort((a, b) => b.price - a.price)
+    } else if (sortOption === 'priceLowToHigh') {
+      products.sort((a, b) => a.price - b.price)
+    }
+
+    const filteredProducts = products.filter(
+      (product) =>
+        product.title.toLowerCase().includes(searchQuery) ||
+        product.subtitle.toLowerCase().includes(searchQuery)
+    )
+
+    res.json(filteredProducts)
   } catch (error) {
     console.error('Error:', error)
   }
@@ -28,12 +44,6 @@ app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'")
   next()
 })
-
-app.get('/', (req, res) => {
-  res.send('Hello, this is your API!')
-})
-
-app.use(express.static('public'))
 app.use(cors())
 
 app.listen(port, () => {
