@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, provide } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
@@ -21,6 +21,57 @@ const onChangeSelect = (event) => {
 const onChangeSearchInput = (event) => {
   filters.searchQuery = event.target.value
 }
+
+const fetchFavorites = async () => {
+  try {
+    const { data: favorites } = await axios.get('http://localhost:3000/api/favorites/')
+    items.value = items.value.map((item) => {
+      const favorite = favorites.find((favorite) => favorite.item_id === item.id)
+
+      if (!favorite) {
+        return item
+      }
+      return {
+        ...item,
+        isFavorite: true,
+        favoriteId: favorite.favorite_id
+      }
+    })
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+const addToFavorite = async (item) => {
+  try {
+    if (!item.isFavorite) {
+      const obj = {
+        item_id: item.id
+      }
+      item.isFavorite = true
+      const { data } = await axios.post('http://localhost:3000/api/favorites/', obj)
+      // await new Promise((resolve) => setTimeout(resolve, 500))
+      await fetchFavorites()
+      item.favoriteId = data.favorite_id
+    } else {
+      await deleteFavoriteItem(item)
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+const deleteFavoriteItem = async (item) => {
+  try {
+    item.isFavorite = false
+    await axios.delete(`http://localhost:3000/api/favorites/${item.favoriteId}`)
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    item.favoriteId = null
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
 const fetchItems = async () => {
   try {
     const params = {
@@ -32,13 +83,22 @@ const fetchItems = async () => {
     }
     const { data } = await axios.get('http://localhost:3000/api/products/', { params })
 
-    items.value = data
+    items.value = data.map((obj) => ({
+      ...obj,
+      isFavorite: false,
+      favoriteId: null,
+      iAdded: false
+    }))
   } catch (error) {
     console.error('Error:', error)
   }
 }
-onMounted(fetchItems)
+onMounted(async () => {
+  await fetchItems()
+  await fetchFavorites()
+})
 watch(filters, fetchItems)
+provide('addToFavorite', addToFavorite)
 </script>
 
 <template>
@@ -70,7 +130,9 @@ watch(filters, fetchItems)
         </div>
       </div>
 
-      <div class="mt-10"><CardList :items="items" /></div>
+      <div class="mt-10">
+        <CardList :items="items" @addToFavorite="addToFavorite" />
+      </div>
     </div>
   </div>
 </template>
