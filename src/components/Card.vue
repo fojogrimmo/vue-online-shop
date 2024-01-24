@@ -18,9 +18,9 @@ defineProps({
     class="relative w-72 bg-white border border-slate-100 rounded-b-lg cursor-pointer transition hover:-translate-y-2 hover:shadow"
   >
     <div class="flex justify-between">
-      <span v-if="isHot" class="absolute top-6 left-5 bg-white font-bold p-1 px-3 rounded-lg"
-        >HOT</span
-      >
+      <span v-if="isHot" class="absolute top-6 left-5 bg-white font-bold p-1 px-3 rounded-lg">{{
+        isHot ? 'HOT' : ''
+      }}</span>
       <button>
         <img
           :src="!isFavorite ? '/like-1.svg' : '/like-2.svg'"
