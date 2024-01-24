@@ -96,6 +96,27 @@ app.delete('/api/favorites/:favorite_id', async (req, res) => {
   }
 })
 
+app.get('/api/orders', async (req, res) => {
+  try {
+    const ordersData = await readFile(new URL('./orders.json', import.meta.url), 'utf-8')
+    const orders = JSON.parse(ordersData)
+    res.json(orders)
+  } catch (error) {
+    console.log('Error:', error)
+  }
+})
+app.post('/api/orders', async (req, res) => {
+  try {
+    const ordersData = await readFile(new URL('./orders.json', import.meta.url), 'utf-8')
+    const orders = JSON.parse(ordersData)
+    const order = req.body
+    orders.push(order)
+    await writeFile(new URL('./orders.json', import.meta.url), JSON.stringify(orders))
+    res.json(orders)
+  } catch (error) {
+    console.error('Error:', error)
+  }
+})
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'")
   next()
