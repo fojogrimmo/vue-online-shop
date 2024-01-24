@@ -1,6 +1,12 @@
 <script setup>
 import DrawerHeader from './DrawerHeader.vue'
 import CartItemList from './CartItemList.vue'
+
+const emit = defineEmits(['createOrder'])
+
+defineProps({
+  totalPrice: Number
+})
 </script>
 
 <template>
@@ -20,10 +26,12 @@ import CartItemList from './CartItemList.vue'
       <div class="flex text-xl gap-2">
         <span>Total</span>
         <div class="flex-1 border-b border-dashed"></div>
-        <b>&#8364;1233</b>
+        <b>&#8364;{{ totalPrice }}</b>
       </div>
 
       <button
+        :disabled="totalPrice === 0"
+        @click="() => emit('createOrder')"
         class="bg-emerald-400 mt-4 w-full rounded-xl py-3 disabled:bg-slate-300 text-white text-lg cursor-pointer hover:bg-emerald-500 active:bg-emerald-600 transition"
       >
         Checkout

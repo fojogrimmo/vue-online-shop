@@ -1,18 +1,66 @@
 <script setup>
-import { ref, reactive, onMounted, watch, provide } from 'vue'
+import { ref, reactive, onMounted, watch, provide, computed } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
 import CardList from './components/CardList.vue'
 import HeaderItem from './components/HeaderItem.vue'
-
-// import Drawer from './components/Drawer.vue'
+import Drawer from './components/Drawer.vue'
 
 const items = ref([])
+const cartItems = ref([])
+
+const drawerOpen = ref(false)
+
+const totalPrice = computed(() =>
+  Number(cartItems.value.reduce((acc, items) => acc + items.price, 0).toFixed(2))
+)
+
+const closeDrawer = () => {
+  drawerOpen.value = false
+}
+const openDrawer = () => {
+  drawerOpen.value = true
+}
+
 const filters = reactive({
   sort: 'default',
   searchQuery: ''
 })
+
+const addToCart = (item) => {
+  cartItems.value.push(item)
+  item.isAdded = true
+}
+
+const removeFromCart = (item) => {
+  cartItems.value.splice(cartItems.value.indexOf(item), 1)
+  item.isAdded = false
+}
+
+const createOrder = async () => {
+  try {
+    const { data } = await axios.post('http://localhost:3000/api/orders/', {
+      items: cartItems.value,
+      totalPrice: totalPrice.value
+    })
+
+    cartItems.value = []
+    drawerOpen.value = false
+
+    return data
+  } catch (error) {
+    console.log('Error:', error)
+  }
+}
+
+const onClickAddCart = (item) => {
+  if (!item.isAdded) {
+    addToCart(item)
+  } else {
+    removeFromCart(item)
+  }
+}
 
 const onChangeSelect = (event) => {
   filters.sort = event.target.value
@@ -87,7 +135,7 @@ const fetchItems = async () => {
       ...obj,
       isFavorite: false,
       favoriteId: null,
-      iAdded: false
+      isAdded: false
     }))
   } catch (error) {
     console.error('Error:', error)
@@ -98,13 +146,19 @@ onMounted(async () => {
   await fetchFavorites()
 })
 watch(filters, fetchItems)
-provide('addToFavorite', addToFavorite)
+provide('cart', {
+  cartItems,
+  closeDrawer,
+  openDrawer,
+  addToCart,
+  removeFromCart
+})
 </script>
 
 <template>
-  <!-- <Drawer /> -->
+  <Drawer v-if="drawerOpen" :total-price="totalPrice" @create-order="createOrder" />
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-white shadow-xl mt-14">
-    <Header />
+    <Header :total-price="totalPrice" @open-drawer="openDrawer" />
     <HeaderItem />
 
     <div class="p-10 m-4">
@@ -131,7 +185,7 @@ provide('addToFavorite', addToFavorite)
       </div>
 
       <div class="mt-10">
-        <CardList :items="items" @addToFavorite="addToFavorite" />
+        <CardList :items="items" @add-to-favorite="addToFavorite" @add-to-cart="onClickAddCart" />
       </div>
     </div>
   </div>
