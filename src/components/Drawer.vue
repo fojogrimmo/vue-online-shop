@@ -1,12 +1,19 @@
 <script setup>
+import { computed } from 'vue'
 import DrawerHeader from './DrawerHeader.vue'
 import CartItemList from './CartItemList.vue'
+import ProductsInfoBlock from './ProductsInfoBlock.vue'
 
 const emit = defineEmits(['createOrder'])
 
-defineProps({
-  totalPrice: Number
+const props = defineProps({
+  totalPrice: Number,
+  isCreatingOrder: Boolean
 })
+
+const disabledButon = computed(() =>
+  props.isCreatingOrder ? true : props.totalPrice ? false : true
+)
 </script>
 
 <template>
@@ -14,9 +21,16 @@ defineProps({
   <div class="bg-white w-1/5 h-full fixed right-0 top-0 z-20 p-10">
     <DrawerHeader />
 
+    <ProductsInfoBlock
+      v-if="!totalPrice"
+      title="Your bag is empty"
+      subtitle="Fear not, have a look at our latest products and start shopping."
+      image-url="/cart-empy.png"
+    />
+
     <CartItemList />
 
-    <div class="flex text-lg flex-col gap-2 mt-7">
+    <div v-if="totalPrice" class="flex text-lg flex-col gap-2 mt-7">
       <div class="flex gap-2">
         <span>Delivery & Handling</span>
         <div class="flex-1 border-b border-dashed"></div>
@@ -30,7 +44,7 @@ defineProps({
       </div>
 
       <button
-        :disabled="totalPrice === 0"
+        :disabled="disabledButon"
         @click="() => emit('createOrder')"
         class="bg-emerald-400 mt-4 w-full rounded-xl py-3 disabled:bg-slate-300 text-white text-lg cursor-pointer hover:bg-emerald-500 active:bg-emerald-600 transition"
       >
