@@ -59,16 +59,31 @@ app.post('/api/favorites', async (req, res) => {
     const favorite = req.body
     const favoritesData = await readFile(new URL('./favorites.json', import.meta.url), 'utf-8')
     const favorites = JSON.parse(favoritesData)
+
+    const productsData = await readFile(new URL('./products.json', import.meta.url), 'utf-8')
+    const products = JSON.parse(productsData)
+
     if (favorite.favorite_id) {
       favorites.push(favorite)
     } else {
       const lastFavorite = favorites[favorites.length - 1]
-      const newFavorite = {
-        favorite_id: lastFavorite ? lastFavorite.favorite_id + 1 : 1,
-        item_id: favorite.item_id
+      const newItem = products.find((product) => product.id === favorite.item_id)
+
+      if (newItem) {
+        const newFavorite = {
+          favorite_id: lastFavorite ? lastFavorite.favorite_id + 1 : 1,
+          item_id: favorite.item_id,
+          title: newItem.title,
+          subtitle: newItem.subtitle,
+          price: newItem.price,
+          imageUrl: newItem.imageUrl
+        }
+
+        favorites.push(newFavorite)
       }
-      favorites.push(newFavorite)
     }
+
+    // Записываем обновленные избранные в файл
     await writeFile(new URL('./favorites.json', import.meta.url), JSON.stringify(favorites))
     res.json(favorites)
   } catch (error) {
