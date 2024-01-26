@@ -1,15 +1,37 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, inject, computed } from 'vue'
+import axios from 'axios'
 import DrawerHeader from './DrawerHeader.vue'
 import CartItemList from './CartItemList.vue'
 import ProductsInfoBlock from './ProductsInfoBlock.vue'
 
-const emit = defineEmits(['createOrder'])
-
 const props = defineProps({
-  totalPrice: Number,
-  isCreatingOrder: Boolean
+  totalPrice: Number
 })
+
+const { cartItems } = inject('cart')
+
+const isCreatingOrder = ref(false)
+const isOrderCreated = ref(false)
+
+const createOrder = async () => {
+  try {
+    isCreatingOrder.value = true
+    const { data } = await axios.post('http://localhost:3000/api/orders/', {
+      items: cartItems.value,
+      totalPrice: props.totalPrice
+    })
+
+    cartItems.value = []
+    isOrderCreated.value = true
+
+    return data
+  } catch (error) {
+    console.log('Error:', error)
+  } finally {
+    isCreatingOrder.value = false
+  }
+}
 
 const disabledButon = computed(() =>
   props.isCreatingOrder ? true : props.totalPrice ? false : true
@@ -22,7 +44,14 @@ const disabledButon = computed(() =>
     <DrawerHeader />
 
     <ProductsInfoBlock
-      v-if="!totalPrice"
+      v-if="isOrderCreated"
+      title="Success!"
+      subtitle="Your items are on their way. Thank you for choosing us!"
+      image-url="/order-success.png"
+    />
+
+    <ProductsInfoBlock
+      v-if="!totalPrice && !isOrderCreated"
       title="Your bag is empty"
       subtitle="Fear not, have a look at our latest products and start shopping."
       image-url="/cart-empy.png"
@@ -45,7 +74,7 @@ const disabledButon = computed(() =>
 
       <button
         :disabled="disabledButon"
-        @click="() => emit('createOrder')"
+        @click="createOrder"
         class="bg-emerald-400 mt-4 w-full rounded-xl py-3 disabled:bg-slate-300 text-white text-lg cursor-pointer hover:bg-emerald-500 active:bg-emerald-600 transition"
       >
         Checkout
