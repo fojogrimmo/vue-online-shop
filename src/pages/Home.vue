@@ -2,6 +2,7 @@
 import { reactive, onMounted, watch, ref } from 'vue'
 import axios from 'axios'
 import { inject } from 'vue'
+import HeaderItem from '../components/HeaderItem.vue'
 import CardList from '../components/CardList.vue'
 
 const { cartItems, addToCart, removeFromCart } = inject('cart')
@@ -123,6 +124,10 @@ watch(filters, fetchItems)
 </script>
 
 <template>
+  <div class="mb-10">
+    <HeaderItem />
+  </div>
+
   <div class="flex justify-between items-center">
     <h2 class="text-3xl font-bold mb-10">Best Sellers</h2>
 
