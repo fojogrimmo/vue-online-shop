@@ -1,13 +1,15 @@
 <script setup>
-import { reactive, onMounted, watch, ref } from 'vue'
+import { reactive, onMounted, watch, ref, inject } from 'vue'
 import axios from 'axios'
-import { inject } from 'vue'
+import debounce from 'lodash.debounce'
 import HeaderItem from '../components/HeaderItem.vue'
 import CardList from '../components/CardList.vue'
 
 const { cartItems, addToCart, removeFromCart } = inject('cart')
 
 const items = ref([])
+
+const { addToFavorite, deleteFavoriteItem } = inject('favoritesActions')
 
 const filters = reactive({
   sort: 'default',
@@ -26,36 +28,17 @@ const onChangeSelect = (event) => {
   filters.sort = event.target.value
 }
 
-const onChangeSearchInput = (event) => {
+const onChangeSearchInput = debounce((event) => {
   filters.searchQuery = event.target.value
-}
+}, 500)
 
-const addToFavorite = async (item) => {
-  try {
-    if (!item.isFavorite) {
-      const obj = {
-        item_id: item.id
-      }
-      item.isFavorite = true
-      const { data } = await axios.post('http://localhost:3000/api/favorites/', obj)
-      await fetchFavorites()
-      item.favoriteId = data.favorite_id
-    } else {
-      await deleteFavoriteItem(item)
-    }
-  } catch (error) {
-    console.error('Error:', error)
-  }
-}
-
-const deleteFavoriteItem = async (item) => {
-  try {
-    item.isFavorite = false
-    await axios.delete(`http://localhost:3000/api/favorites/${item.favoriteId}`)
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    item.favoriteId = null
-  } catch (error) {
-    console.error('Error:', error)
+const handleFavoriteAction = async (item) => {
+  if (!item.isFavorite) {
+    await addToFavorite(item)
+    await fetchFavorites()
+  } else {
+    await deleteFavoriteItem(item)
+    await fetchFavorites()
   }
 }
 
@@ -151,6 +134,10 @@ watch(filters, fetchItems)
   </div>
 
   <div class="mt-10">
-    <CardList :items="items" @add-to-favorite="addToFavorite" @add-to-cart="onClickAddCart" />
+    <CardList
+      :items="items"
+      @add-to-favorite="handleFavoriteAction"
+      @add-to-cart="onClickAddCart"
+    />
   </div>
 </template>

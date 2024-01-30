@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, provide, computed } from 'vue'
+import axios from 'axios'
 
 import Header from './components/Header.vue'
 import Drawer from './components/Drawer.vue'
@@ -17,6 +18,40 @@ const closeDrawer = () => {
 }
 const openDrawer = () => {
   drawerOpen.value = true
+}
+
+const addToFavorite = async (item) => {
+  try {
+    if (!item.isFavorite) {
+      const obj = {
+        item_id: item.id
+      }
+      console.log(obj)
+      item.isFavorite = true
+      const { data } = await axios.post('http://localhost:3000/api/favorites/', obj)
+      item.favoriteId = data.favorite_id
+    } else {
+      await deleteFavoriteItem(item)
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+const deleteFavoriteItem = async (item) => {
+  try {
+    if (item.isFavorite) {
+      item.isFavorite = false
+      console.log(item.favoriteId)
+      await axios.delete(`http://localhost:3000/api/favorites/${item.favoriteId}`)
+
+      item.favoriteId = null
+    } else {
+      await addToFavorite(item)
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
 }
 
 const addToCart = (item) => {
@@ -43,6 +78,11 @@ provide('cart', {
   openDrawer,
   addToCart,
   removeFromCart
+})
+
+provide('favoritesActions', {
+  addToFavorite,
+  deleteFavoriteItem
 })
 </script>
 

@@ -1,55 +1,45 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, inject } from 'vue'
 import axios from 'axios'
 
 import CardList from '../components/CardList.vue'
-const favorites = ref([])
 
-const addToFavorite = async (item) => {
+const { addToFavorite, deleteFavoriteItem } = inject('favoritesActions')
+
+const favorites = ref([])
+const items = ref([])
+
+const handleFavoriteAction = async (item) => {
+  if (!item.isFavorite) {
+    await addToFavorite(item)
+  } else {
+    await deleteFavoriteItem(item)
+  }
+}
+
+const fetchItems = async () => {
   try {
-    if (!item.isFavorite) {
-      const obj = {
-        item_id: item.id
-      }
-      item.isFavorite = true
-      const { data } = await axios.post('http://localhost:3000/api/favorites/', obj)
-      favorites.value.push(data)
-      item.favoriteId = data.favorite_id
-    } else {
-      console.log('item is already in favorites')
-    }
+    const { data } = await axios.get('http://localhost:3000/api/products/')
+
+    items.value = data.map((obj) => ({
+      ...obj,
+      isFavorite: false,
+      favoriteId: null,
+      isAdded: false
+    }))
   } catch (error) {
     console.error('Error:', error)
   }
 }
 
-// const onClickAddCart = async (item) => {
-//   try {
-//     if (!item.isAdded) {
-//       // логика добавления в корзину
-//     } else {
-//     }
-//   } catch (error) {
-//     console.error('Error:', error)
-//   }
-// }
-
-// const deleteFavoriteItem = async (item) => {
-//   try {
-//     item.isFavorite = false
-//     await axios.delete(`http://localhost:3000/api/favorites/${item.favoriteId}`)
-//     item.favoriteId = null
-//   } catch (error) {
-//     console.error('Error:', error)
-//   }
-// }
-
 onMounted(async () => {
   try {
+    await fetchItems()
     const { data } = await axios.get('http://localhost:3000/api/favorites/')
     favorites.value = data.map((item) => ({
       ...item,
-      isFavorite: true
+      isFavorite: true,
+      favoriteId: item.favorite_id
     }))
     console.log(data)
   } catch (error) {
@@ -61,6 +51,10 @@ onMounted(async () => {
 <template>
   <div class="h-screen">
     <h1 class="text-3xl font-bold mb-10">Wishlist</h1>
-    <CardList :items="favorites" @add-to-favorite="addToFavorite" @add-to-cart="onClickAddCart" />
+    <CardList
+      :items="favorites"
+      @add-to-favorite="handleFavoriteAction"
+      @add-to-cart="onClickAddCart"
+    />
   </div>
 </template>
