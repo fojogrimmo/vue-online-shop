@@ -14,6 +14,14 @@ app.use((req, res, next) => {
   next()
 })
 
+app.get('/', (req, res) => {
+  try {
+    res.send('Server is running')
+  } catch (error) {
+    console.error('Error:', error)
+  }
+})
+
 const calculateFavoriteId = (favorites) => {
   return favorites.map((favorite, index) => ({ ...favorite, favorite_id: index + 1 }))
 }
