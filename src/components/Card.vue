@@ -15,7 +15,7 @@ defineProps({
 
 <template>
   <div
-    class="relative w-72 bg-white border border-slate-100 rounded-b-lg cursor-pointer transition hover:-translate-y-2 hover:shadow"
+    class="relative w-72 bg-white border border-slate-100 rounded-t-lg cursor-pointer transition hover:-translate-y-2 hover:shadow"
   >
     <div class="flex justify-between">
       <span v-if="isHot" class="absolute top-6 left-5 bg-white font-bold p-1 px-3 rounded-lg">{{
@@ -31,7 +31,7 @@ defineProps({
       </button>
     </div>
 
-    <img :src="imageUrl" alt="Sneakers" />
+    <img :src="imageUrl" alt="Sneakers" class="rounded-t-lg" />
 
     <div class="p-2">
       <p class="font-medium mt-1">{{ title }}</p>
