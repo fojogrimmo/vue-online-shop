@@ -4,10 +4,12 @@ import axios from 'axios'
 import debounce from 'lodash.debounce'
 import HeaderItem from '../components/HeaderItem.vue'
 import CardList from '../components/CardList.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
 
 const { cartItems, addToCart, removeFromCart } = inject('cart')
 
 const items = ref([])
+const loading = ref(true)
 
 const { addToFavorite, deleteFavoriteItem } = inject('favoritesActions')
 
@@ -59,6 +61,7 @@ const fetchItems = async () => {
       favoriteId: null,
       isAdded: false
     }))
+    loading.value = false
   } catch (error) {
     console.error('Error:', error)
   }
@@ -107,37 +110,51 @@ watch(filters, fetchItems)
 </script>
 
 <template>
-  <div class="mb-10">
-    <HeaderItem />
-  </div>
+  <div v-if="!loading">
+    <div class="mb-10">
+      <HeaderItem />
+    </div>
 
-  <div class="flex justify-between items-center">
-    <h2 class="text-3xl font-bold mb-10">Best Sellers</h2>
+    <div class="flex justify-between items-center">
+      <h2 class="text-3xl font-bold mb-10">Best Sellers</h2>
 
-    <div class="flex gap-2">
-      <select @change="onChangeSelect" class="py-2 px-3 border rounded-md outline-none">
-        <option value="default">Default</option>
-        <option value="priceHighToLow">Price High to Low</option>
-        <option value="priceLowToHigh">Price Low to High</option>
-      </select>
+      <div class="flex gap-2">
+        <select @change="onChangeSelect" class="py-2 px-3 border rounded-md outline-none">
+          <option value="default">Default</option>
+          <option value="priceHighToLow">Price High to Low</option>
+          <option value="priceLowToHigh">Price Low to High</option>
+        </select>
 
-      <div class="relative">
-        <img class="absolute left-3 top-3" src="/search.svg" alt="Search" />
-        <input
-          @input="onChangeSearchInput"
-          type="text"
-          placeholder="Search..."
-          class="p-2 pl-11 pr-4 border rounded-md outline-none focus:border-gray-400"
-        />
+        <div class="relative">
+          <img class="absolute left-3 top-3" src="/search.svg" alt="Search" />
+          <input
+            @input="onChangeSearchInput"
+            type="text"
+            placeholder="Search..."
+            class="p-2 pl-11 pr-4 border rounded-md outline-none focus:border-gray-400"
+          />
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="mt-10">
-    <CardList
-      :items="items"
-      @add-to-favorite="handleFavoriteAction"
-      @add-to-cart="onClickAddCart"
-    />
+    <div class="mt-10">
+      <CardList
+        :items="items"
+        @add-to-favorite="handleFavoriteAction"
+        @add-to-cart="onClickAddCart"
+      />
+    </div>
+  </div>
+  <div v-else class="h-screen">
+    <div class="grid grid-cols-4 gap-5 w-fit m-auto">
+      <SkeletonLoader />
+      <SkeletonLoader />
+      <SkeletonLoader />
+      <SkeletonLoader />
+      <SkeletonLoader />
+      <SkeletonLoader />
+      <SkeletonLoader />
+      <SkeletonLoader />
+    </div>
   </div>
 </template>

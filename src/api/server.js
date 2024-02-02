@@ -91,7 +91,6 @@ app.post('/api/favorites', async (req, res) => {
       }
     }
 
-    // Записываем обновленные избранные в файл
     await writeFile(new URL('./favorites.json', import.meta.url), JSON.stringify(favorites))
     res.json(favorites)
   } catch (error) {

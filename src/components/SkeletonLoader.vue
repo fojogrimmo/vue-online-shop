@@ -26,7 +26,7 @@
         <div class="w-12 h-12 mr-2 bg-gray-200 rounded-md dark:bg-gray-700"></div>
       </div>
       <div
-        class="absolute bottom-4 h-2.5 w-16 bg-gray-200 rounded-full dark:bg-gray-700 w-32"
+        class="w-11 absolute bottom-4 h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32"
       ></div>
       <span class="sr-only">Loading...</span>
     </div>
