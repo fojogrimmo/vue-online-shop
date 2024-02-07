@@ -4,19 +4,34 @@ import axios from 'axios'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
 import CardList from '../components/CardList.vue'
 const { addToCart, removeFromCart } = inject('cart')
-const { addToFavorite, deleteFavoriteItem } = inject('favoritesActions')
+const { deleteFavoriteItem } = inject('favoritesActions')
 
 const favorites = ref([])
 const items = ref([])
 const loading = ref(true)
 
+const addToFavorite = async (item) => {
+  try {
+    if (!item.isFavorite) {
+      const obj = {
+        item_id: item.item_id
+      }
+      item.isFavorite = true
+      const { data } = await axios.post('http://localhost:3000/api/favorites/', obj)
+      item.favoriteId = data.favorite_id
+    } else {
+      await deleteFavoriteItem(item)
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
 const handleFavoriteAction = async (item) => {
   if (!item.isFavorite) {
-    await fetchItems()
     await addToFavorite(item)
   } else {
     await deleteFavoriteItem(item)
-    await fetchFavorites()
   }
 }
 
@@ -25,7 +40,6 @@ const onClickAddCart = (item) => {
     addToCart(item)
   } else {
     removeFromCart(item)
-    console.log(item)
   }
 }
 
@@ -44,35 +58,16 @@ const fetchItems = async () => {
   }
 }
 
-const fetchFavorites = async () => {
-  try {
-    const { data: favorites } = await axios.get('http://localhost:3000/api/favorites/')
-    items.value = items.value.map((item) => {
-      const favorite = favorites.find((favorite) => favorite.item_id === item.id)
-
-      if (!favorite) {
-        return item
-      }
-      return {
-        ...item,
-        isFavorite: true,
-        favoriteId: favorite.favorite_id
-      }
-    })
-  } catch (error) {
-    console.error('Error:', error)
-  }
-}
-
 onMounted(async () => {
   try {
     await fetchItems()
+
     const { data } = await axios.get('http://localhost:3000/api/favorites/')
-    console.log(data)
     favorites.value = data.map((item) => ({
       ...item,
       isFavorite: true,
-      favoriteId: item.favorite_id
+      favoriteId: item.favorite_id,
+      item_id: item.item_id
     }))
     loading.value = false
   } catch (error) {

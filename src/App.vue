@@ -26,7 +26,6 @@ const addToFavorite = async (item) => {
       const obj = {
         item_id: item.id
       }
-      console.log(obj)
       item.isFavorite = true
       const { data } = await axios.post('http://localhost:3000/api/favorites/', obj)
       item.favoriteId = data.favorite_id
@@ -42,9 +41,8 @@ const deleteFavoriteItem = async (item) => {
   try {
     if (item.isFavorite) {
       item.isFavorite = false
-      console.log(item.favoriteId)
-      await axios.delete(`http://localhost:3000/api/favorites/${item.favoriteId}`)
 
+      await axios.delete(`http://localhost:3000/api/favorites/${item.favoriteId}`)
       item.favoriteId = null
     } else {
       await addToFavorite(item)
