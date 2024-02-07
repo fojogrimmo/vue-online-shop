@@ -6,7 +6,6 @@ import Header from './components/Header.vue'
 import Drawer from './components/Drawer.vue'
 
 const cartItems = ref([])
-
 const drawerOpen = ref(false)
 
 const totalPrice = computed(() =>

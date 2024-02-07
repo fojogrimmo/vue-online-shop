@@ -3,6 +3,7 @@ import { onMounted, ref, inject } from 'vue'
 import axios from 'axios'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
 import CardList from '../components/CardList.vue'
+import ProductsInfoBlock from '../components/ProductsInfoBlock.vue'
 const { addToCart, removeFromCart } = inject('cart')
 const { deleteFavoriteItem } = inject('favoritesActions')
 
@@ -79,6 +80,14 @@ onMounted(async () => {
 <template>
   <div v-if="!loading" class="h-screen">
     <h1 class="text-3xl font-bold mb-10">Wishlist</h1>
+
+    <ProductsInfoBlock
+      v-if="!favorites.length"
+      title="Oops! You have no products in your wishlist"
+      subtitle="Add a product to your wishlist so you don’t lose it"
+      image-url="/broken-heart.png"
+    />
+
     <CardList
       :items="favorites"
       @add-to-favorite="handleFavoriteAction"
