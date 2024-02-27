@@ -4,7 +4,7 @@ import axios from 'axios'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
 import CardList from '../components/CardList.vue'
 import ProductsInfoBlock from '../components/ProductsInfoBlock.vue'
-const { addToCart, removeFromCart } = inject('cart')
+const { cartItems, addToCart, removeFromCart } = inject('cart')
 const { deleteFavoriteItem } = inject('favoritesActions')
 
 const favorites = ref([])
@@ -70,6 +70,8 @@ onMounted(async () => {
       favoriteId: item.favorite_id,
       item_id: item.item_id
     }))
+    const localData = localStorage.getItem('cartItems')
+    cartItems.value = localData ? JSON.parse(localData) : []
     loading.value = false
   } catch (error) {
     console.log('Error:', error)
