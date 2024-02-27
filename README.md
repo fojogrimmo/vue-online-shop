@@ -1,5 +1,6 @@
 # vue-shop
 
+![image](https://github.com/fojogrimmo/vue-golf-shop/assets/111078093/006f3ce6-2d32-47ad-864f-4e87703f0ae6)
 
 ## Recommended IDE Setup
 
