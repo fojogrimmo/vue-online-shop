@@ -1,5 +1,5 @@
 <template>
-  <div class="relative items-center">
+  <div class="hidden md:relative md:items-center md:inline">
     <img class="m-auto min-w-full px-16" src="/cover.jpg" alt="Cover image" />
     <div class="absolute top-40 left-40 p-20 w-4/12">
       <h2
