@@ -31,7 +31,7 @@ defineProps({
       </button>
     </div>
 
-    <img :src="imageUrl" alt="Sneakers" class="rounded-t-lg" />
+    <img :src="imageUrl" alt="Product" class="rounded-t-lg" />
 
     <div class="p-2">
       <p class="font-medium mt-1">{{ title }}</p>
