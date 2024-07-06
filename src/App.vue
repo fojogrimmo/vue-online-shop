@@ -7,16 +7,28 @@ import Drawer from './components/Drawer.vue'
 
 const cartItems = ref([])
 const drawerOpen = ref(false)
+const regOpen = ref(false)
 
 const totalPrice = computed(() =>
-  Number(cartItems.value.reduce((acc, items) => acc + items.price, 0).toFixed(2))
-)
+  Number(
+    cartItems.value.reduce((acc, items) => acc + Number(items.price), 0).toFixed(2)
+  )
+);
+
 
 const closeDrawer = () => {
   drawerOpen.value = false
 }
 const openDrawer = () => {
   drawerOpen.value = true
+}
+
+const closeRegForm = () => {
+  regOpen.value = false;
+}
+
+const openRegForm = () => {
+  regOpen.value = true;
 }
 
 const addToFavorite = async (item) => {
@@ -73,6 +85,8 @@ provide('cart', {
   cartItems,
   closeDrawer,
   openDrawer,
+  openRegForm,
+  closeRegForm,
   addToCart,
   removeFromCart
 })
@@ -84,9 +98,10 @@ provide('favoritesActions', {
 </script>
 
 <template>
+  <!-- <Registration v-if="regOpen"/> -->
   <Drawer v-if="drawerOpen" :total-price="totalPrice" />
   <div class="bg-white w-4/5 h-auto m-auto rounded-xl shadow-white shadow-xl mt-14">
-    <Header :total-price="totalPrice" @open-drawer="openDrawer" />
+    <Header :total-price="totalPrice" @open-drawer="openDrawer" @open-reg-form="openRegForm"/>
 
     <div class="m-4 p-5">
       <router-view></router-view>

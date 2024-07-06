@@ -1,9 +1,12 @@
 import express from 'express'
-import { readFile, writeFile } from 'fs/promises'
 import cors from 'cors'
+import pool from './db.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express()
 const port = 3000
+const secretKey = 'very_secret_key';
 
 app.use(express.json())
 app.use((req, res, next) => {
@@ -22,123 +25,263 @@ app.get('/', (req, res) => {
   }
 })
 
-const calculateFavoriteId = (favorites) => {
-  return favorites.map((favorite, index) => ({ ...favorite, favorite_id: index + 1 }))
-}
+app.post('/api/signup', async (req, res) => {
+  const { name, email, password, is_admin } = req.body;
+  
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password, is_admin) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, email, hashedPassword, is_admin]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    let isValidPassword;
+    if (user.is_admin) {
+      isValidPassword = (password === user.password);
+    } else {
+      isValidPassword = await bcrypt.compare(password, user.password);
+    }
+
+   
+    if (!isValidPassword) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign({ userId: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+
+    res.json({ token, user: { id: user.id, email: user.email, name: user.name , is_admin: user.is_admin }});
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/api/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.post('/api/users', async (req, res) => {
+  const { name, email, password, is_admin } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password, is_admin) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, email, hashedPassword, is_admin]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+app.patch('/api/users/:id/admin', async (req, res) => {
+  const userId = req.params.id;
+  const { is_admin } = req.body;
+
+  try {
+    await pool.query('UPDATE users SET is_admin = $1 WHERE id = $2', [is_admin, userId]);
+    res.status(200).send('Admin status updated');
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.delete('/api/users/:id', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const result = await pool.query('DELETE FROM users WHERE id = $1', [userId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 app.get('/api/products', async (req, res) => {
   try {
-    const data = await readFile(new URL('./products.json', import.meta.url), 'utf-8')
-    let products = JSON.parse(data)
+    const result = await pool.query('SELECT * FROM products');
+    let products = result.rows;
 
-    const sortOption = req.query.sort
-    const searchQuery = req.query.title ? req.query.title.toLowerCase() : ''
+    products = products.map(product => ({
+      ...product,
+      price: parseFloat(product.price)
+    }));
+
+    const sortOption = req.query.sort;
+    const searchQuery = req.query.title ? req.query.title.toLowerCase() : '';
 
     if (sortOption === 'priceHighToLow') {
-      products.sort((a, b) => b.price - a.price)
+      products.sort((a, b) => b.price - a.price);
     } else if (sortOption === 'priceLowToHigh') {
-      products.sort((a, b) => a.price - b.price)
+      products.sort((a, b) => a.price - b.price);
     }
 
     const filteredProducts = products.filter(
       (product) =>
         product.title.toLowerCase().includes(searchQuery) ||
         product.subtitle.toLowerCase().includes(searchQuery)
-    )
+    );
 
-    res.json(filteredProducts)
+    res.json(filteredProducts);
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
   }
 })
 
+app.post('/api/products', async (req, res) => {
+  const { title, subtitle, price, imageurl } = req.body;
+
+  if (!title || !subtitle || !price || !imageurl) {
+    return res.status(400).send('All fields are required');
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO products (title, subtitle, price, imageurl) VALUES ($1, $2, $3, $4) RETURNING *',
+      [title, subtitle, price, imageurl]
+    );
+    
+
+    const newProduct = result.rows[0];
+    res.status(201).json(newProduct);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+  const productId = req.params.id;
+
+  try {
+    const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [productId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).send('Product not found');
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.get('/api/favorites', async (req, res) => {
   try {
-    const favoritesData = await readFile(new URL('./favorites.json', import.meta.url), 'utf-8')
-    const favorites = JSON.parse(favoritesData)
-    res.json(favorites)
+    const result = await pool.query('SELECT * FROM favorites');
+    res.json(result.rows);
   } catch (error) {
-    console.log('Error:', error)
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
   }
 })
 
 app.post('/api/favorites', async (req, res) => {
   try {
-    const favorite = req.body
-    const favoritesData = await readFile(new URL('./favorites.json', import.meta.url), 'utf-8')
-    const favorites = JSON.parse(favoritesData)
+    const favorite = req.body;
 
-    const productsData = await readFile(new URL('./products.json', import.meta.url), 'utf-8')
-    const products = JSON.parse(productsData)
+    const productResult = await pool.query('SELECT * FROM products WHERE id = $1', [favorite.item_id]);
+    const product = productResult.rows[0];
 
-    if (favorite.favorite_id) {
-      favorites.push(favorite)
+    if (product) {
+      const result = await pool.query(
+        'INSERT INTO favorites (item_id, title, subtitle, price, imageurl) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [favorite.item_id, product.title, product.subtitle, product.price, product.imageurl]
+      );
+      res.json(result.rows[0]);
     } else {
-      const lastFavorite = favorites[favorites.length - 1]
-      const newItem = products.find((product) => product.id === favorite.item_id)
-
-      if (newItem) {
-        const newFavorite = {
-          favorite_id: lastFavorite ? lastFavorite.favorite_id + 1 : 1,
-          item_id: favorite.item_id,
-          title: newItem.title,
-          subtitle: newItem.subtitle,
-          price: newItem.price,
-          imageUrl: newItem.imageUrl
-        }
-
-        favorites.push(newFavorite)
-      }
+      res.status(404).send('Product not found');
     }
-
-    await writeFile(new URL('./favorites.json', import.meta.url), JSON.stringify(favorites))
-    res.json(favorites)
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
   }
 })
 
 app.delete('/api/favorites/:favorite_id', async (req, res) => {
   try {
-    const favoriteIdDelete = parseInt(req.params.favorite_id, 10)
-    const favoritesData = await readFile(new URL('./favorites.json', import.meta.url), 'utf-8')
-    let favorites = JSON.parse(favoritesData)
-
-    const indexToDelete = favorites.findIndex(
-      (favorite) => favorite.favorite_id === favoriteIdDelete
-    )
-    if (indexToDelete !== -1) {
-      favorites.splice(indexToDelete, 1)
-      favorites = calculateFavoriteId(favorites)
-      await writeFile(new URL('./favorites.json', import.meta.url), JSON.stringify(favorites))
-      res.json(favorites)
-    }
+    const favoriteId = parseInt(req.params.favorite_id, 10);
+    await pool.query('DELETE FROM favorites WHERE favorite_id = $1', [favoriteId]);
+    res.status(204).send();
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
   }
 })
 
 app.get('/api/orders', async (req, res) => {
   try {
-    const ordersData = await readFile(new URL('./orders.json', import.meta.url), 'utf-8')
-    const orders = JSON.parse(ordersData)
-    res.json(orders)
+    const result = await pool.query('SELECT * FROM orders');
+    res.json(result.rows);
+
   } catch (error) {
     console.log('Error:', error)
   }
 })
+
 app.post('/api/orders', async (req, res) => {
   try {
-    const ordersData = await readFile(new URL('./orders.json', import.meta.url), 'utf-8')
-    const orders = JSON.parse(ordersData)
-    const order = req.body
-    orders.push(order)
-    await writeFile(new URL('./orders.json', import.meta.url), JSON.stringify(orders))
-    res.json(orders)
+    const order = req.body;
+
+    const orderResult = await pool.query('INSERT INTO orders (total_price) VALUES ($1) RETURNING id', [order.totalPrice]);
+    const orderId = orderResult.rows[0].id;
+
+    for (const item of order.items) {
+      await pool.query('INSERT INTO order_items (order_id, product_id) VALUES ($1, $2)', [orderId, item.id]);
+    }
+
+    res.status(201).json({ message: 'Order created successfully' });
   } catch (error) {
     console.error('Error:', error)
   }
 })
+
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'")
   next()

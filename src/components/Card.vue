@@ -3,7 +3,7 @@ defineProps({
   id: Number,
   title: String,
   subtitle: String,
-  imageUrl: String,
+  imageurl: String,
   price: Number,
   isFavorite: Boolean,
   isAdded: Boolean,
@@ -15,7 +15,7 @@ defineProps({
 
 <template>
   <div
-    class="relative w-72 bg-white border border-slate-100 rounded-t-lg cursor-pointer transition hover:-translate-y-2 hover:shadow"
+    class="relative w-full sm:w-72 bg-white border border-slate-100 rounded-t-lg cursor-pointer transition hover:-translate-y-2 hover:shadow"
   >
     <div class="flex justify-between">
       <span v-if="isHot" class="absolute top-6 left-5 bg-white font-bold p-1 px-3 rounded-lg">{{
@@ -31,7 +31,7 @@ defineProps({
       </button>
     </div>
 
-    <img :src="imageUrl" alt="Product" class="rounded-t-lg" />
+    <img :src="imageurl" alt="Product" class="rounded-t-lg w-full" />
 
     <div class="p-2">
       <p class="font-medium mt-1">{{ title }}</p>
@@ -52,3 +52,5 @@ defineProps({
     </div>
   </div>
 </template>
+
+

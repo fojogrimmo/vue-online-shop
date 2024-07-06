@@ -115,10 +115,10 @@ watch(filters, fetchItems)
       <HeaderItem />
     </div>
 
-    <div class="flex justify-between items-center">
-      <h2 class="text-3xl font-bold mb-10">Best Sellers</h2>
+    <div class="flex justify-between items-center flex-col sm:flex-row mb-5 sm:mb-10">
+      <h2 class="text-3xl font-bold mb-5 sm:mb-0">Best Sellers</h2>
 
-      <div class="flex gap-2">
+      <div class="flex gap-2 mt-5 sm:mt-0">
         <select @change="onChangeSelect" class="py-2 px-3 border rounded-md outline-none">
           <option value="default">Default</option>
           <option value="priceHighToLow">Price High to Low</option>
@@ -146,15 +146,9 @@ watch(filters, fetchItems)
     </div>
   </div>
   <div v-else class="h-screen">
-    <div class="grid grid-cols-4 gap-5 w-fit m-auto">
-      <SkeletonLoader />
-      <SkeletonLoader />
-      <SkeletonLoader />
-      <SkeletonLoader />
-      <SkeletonLoader />
-      <SkeletonLoader />
-      <SkeletonLoader />
-      <SkeletonLoader />
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 w-fit m-auto">
+      <SkeletonLoader v-for="n in 8" :key="n" />
     </div>
   </div>
 </template>
+
