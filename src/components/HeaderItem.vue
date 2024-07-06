@@ -1,9 +1,9 @@
 <template>
   <div class="hidden md:relative md:items-center md:inline">
     <img class="m-auto min-w-full px-16" src="/cover.jpg" alt="Cover image" />
-    <div class="absolute top-40 left-40 p-20 w-4/12">
+    <div class="absolute top-28 left-40 p-20 w-4/12">
       <h2
-        class="mb-5 text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-zinc-300 via-slate-100 to-zinc-500"
+        class="mb-5 text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-zinc-300 via-slate-100 to-zinc-500"
       >
         More than just a game. <br />
         It's a lifestyle.

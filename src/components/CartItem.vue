@@ -4,8 +4,9 @@ defineProps({
   id: Number,
   title: String,
   imageUrl: String,
-  price: Number
+  price: Number,
 })
+
 </script>
 
 <template>

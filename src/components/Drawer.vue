@@ -39,7 +39,7 @@ const disabledButon = computed(() =>
 </script>
 
 <template>
-  <div class="fixed top-o left-0 h-full w-full bg-black z-10 opacity-50"></div>
+  <div class="fixed top-0 left-0 h-full w-full bg-black z-10 opacity-50"></div>
   <div class="bg-white w-1/5 h-full fixed right-0 top-0 z-20 p-10">
     <DrawerHeader />
 
@@ -69,7 +69,7 @@ const disabledButon = computed(() =>
       <div class="flex text-xl gap-2">
         <span>Total</span>
         <div class="flex-1 border-b border-dashed"></div>
-        <b>&#8364;{{ totalPrice }}</b>
+        <b>&#8364;{{ totalPrice}}</b>
       </div>
 
       <button
