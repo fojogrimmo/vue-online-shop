@@ -7,13 +7,14 @@ Functionality:
 - Sending order information to the server
 - Storing the status of products on the server
 - Profuct filter (price low/high, search by name)
+  
+## What was used in this project
+
+Vite + Vue.js (Vue Router, Pinia) + Node.js (npm, Express.js, node-postgres)
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Project Setup
 
@@ -38,8 +39,8 @@ node server.js
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Restore DB from the file 
 
 ```sh
-npm run lint
+(../src/database/create_db.sql)
 ```
