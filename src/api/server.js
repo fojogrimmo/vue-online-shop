@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import pool from '../database/db.js/index.js'
+import pool from '../database/db.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
