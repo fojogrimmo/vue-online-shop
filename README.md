@@ -1,6 +1,17 @@
 # vue-online-shop
 
-![image](https://github.com/fojogrimmo/vue-golf-shop/assets/111078093/006f3ce6-2d32-47ad-864f-4e87703f0ae6)
+### Main page
+![image](https://github.com/user-attachments/assets/76b3e863-1f35-4a99-8267-b0b86e832141)
+
+### Sign in modal
+
+![image](https://github.com/user-attachments/assets/8ea92a1f-fc51-4fca-875d-996a611219e4)
+
+### Profile page
+
+![image](https://github.com/user-attachments/assets/087a12e2-a274-4bd1-950d-4106d0e74235)
+
+
 
 ## Functionality
 - Add/remove to/from cart
