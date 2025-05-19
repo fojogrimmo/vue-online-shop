@@ -11,7 +11,11 @@
 
 ![image](https://github.com/user-attachments/assets/087a12e2-a274-4bd1-950d-4106d0e74235)
 
+### Cart
+![image](https://github.com/user-attachments/assets/73db633a-398f-4b57-8d16-61de898fac0f)
 
+### Skeleton loader
+![image](https://github.com/user-attachments/assets/83ce521c-6c22-4296-87d0-1dc49ddbc766)
 
 ## Functionality
 - Add/remove to/from cart
